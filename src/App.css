@@ -1,0 +1,77 @@
+:root { font-family: Rubik, system-ui, sans-serif; }
+body, #root, .app-shell { margin: 0; min-height: 100dvh; background: #f0f0f0; color: #000; }
+
+.liquid-glass {
+ background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.45) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.fixed-center {
+  position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+  width: min(92%, 1080px); z-index: 60; display: flex; justify-content: center; gap: 40px; align-items: center;
+  border-radius: 999px; padding: 8px 24px;
+}
+.fixed-center {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+.brand { font-weight: 800; border-radius: 999px; padding: 10px 18px; color: #000; background: transparent; }
+.tabs { display: flex; gap: 12px; }
+.tabs button { border-radius: 999px; padding: 10px 24px; font-weight: 700; cursor: pointer; color: #000; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.4); transition: all 0.3s ease; }
+.tabs button.active { background: #000 !important; color: #fff !important; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+.home-frame { width: 100%; height: 100dvh; border: 0; display: block; }
+.stage { position: relative; min-height: 100dvh; }
+.bg-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.veil { position: fixed; inset: 0; background: rgba(255,255,255,.06); z-index: 1; }
+
+.board.roomy-3 { position: relative; z-index: 2; width: min(96%, 1650px); margin: 118px auto 26px; display: grid; grid-template-columns: 1fr 1.9fr 1fr; gap: 20px; }
+.card { border-radius: 24px; padding: 20px; color: #000; }
+.card h3 { margin: 0 0 12px; font-size: 1.8rem; color: #000; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; }
+.log-scroll { max-height: 520px; overflow: auto; }
+.log-item { border-radius: 12px; padding: 10px; margin-bottom: 8px; color: #000; font-weight: 600; }
+
+.center-block { text-align: center; padding: 14px 8px 6px; }
+.center-block p { margin: 0; color: rgba(0, 0, 0, 0.6); font-weight: 600; }
+.center-block h1 { margin: 6px 0; font-size: clamp(3.4rem,7vw,6.6rem); line-height: .92; color: #000; }
+.center-block h2 { margin: 0; font-weight: 600; color: rgba(0, 0, 0, 0.8); }
+.price { font-size: clamp(4.2rem,9vw,8.2rem); font-weight: 900; color: #000; line-height: .9; margin: 12px 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
+.controls.big button { min-width: 90px; }
+button, input { color: #000; border-radius: 12px; padding: 10px 14px; font-weight: 700; font-size: 1rem; }
+input { min-width: 260px; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.4); }
+input::placeholder { color: rgba(0,0,0,0.4); opacity: 1; }
+
+.squad-layout.wide-cards { position: relative; z-index: 2; width: min(96%, 1650px); margin: 118px auto 26px; display: grid; gap: 14px; }
+.squad-expand summary { list-style: none; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.count-pill { border-radius: 999px; padding: 8px 12px; }
+.card h3 { margin: 0; font-size: 28px; font-weight: 800; color: #000; letter-spacing: -0.5px; }
+.card .budget { font-size: 36px; font-weight: 900; color: #000; margin: 4px 0 0; }
+.card .muted { color: rgba(0, 0, 0, 0.5); font-size: 14px; margin-top: 2px; }
+.squad-inner { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 12px; }
+.players { max-height: 220px; overflow: auto; }
+
+@media (max-width: 1200px) {
+  .board.roomy-3 { grid-template-columns: 1fr; }
+}

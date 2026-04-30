@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Auction</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+  @font-face {
+    font-family: "Helvetica Regular";
+    src: url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.eot");
+    src: url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.eot?#iefix") format("embedded-opentype"),
+         url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.woff2") format("woff2"),
+         url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.woff") format("woff"),
+         url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.ttf") format("truetype"),
+         url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.svg#Helvetica Regular") format("svg");
+  }
+
+  :root {
+    font-family: "Helvetica Regular", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    background-color: #f0f0f0;
+    font-family: "Helvetica Regular", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .font-rubik { font-family: 'Rubik', ui-sans-serif, system-ui, sans-serif; }
+  .font-instrument { font-family: 'Instrument Serif', ui-serif, Georgia, serif; }
+
+  /* Targo: clipped-corner buttons */
+  .clip-corner-btn {
+    clip-path: polygon(
+      12px 0, 100% 0, 100% calc(100% - 12px),
+      calc(100% - 12px) 100%, 0 100%, 0 12px
+    );
+  }
+  .clip-corner-btn-sm {
+    clip-path: polygon(
+      8px 0, 100% 0, 100% calc(100% - 8px),
+      calc(100% - 8px) 100%, 0 100%, 0 8px
+    );
+  }
+
+  /* Asme: liquid glass */
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.01);
+    background-blend-mode: luminosity;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .liquid-glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.15) 20%,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0) 60%,
+      rgba(255, 255, 255, 0.15) 80%,
+      rgba(255, 255, 255, 0.45) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Targo: heavy glass for consultation card */
+  .targo-glass {
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0) 100%),
+      rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 0 -1px 0 rgba(0,0,0,0.25),
+      0 20px 40px rgba(0,0,0,0.35);
+  }
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react/jsx-dev-runtime": "https://esm.sh/react@18.3.1/jsx-dev-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "motion/react": "https://esm.sh/motion@11.11.17/react?external=react,react-dom",
+    "lucide-react": "https://esm.sh/lucide-react@0.456.0?external=react"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import React from "react";
+    import { createRoot } from "react-dom/client";
+    import { motion } from "motion/react";
+    import { ChevronRight, ArrowUpRight, Sparkles, Phone, ArrowRight, Globe, Instagram, Twitter } from "lucide-react";
+
+    const e = React.createElement;
+
+    /* ---------- HeroBadge ---------- */
+    function HeroBadge() {
+      return e(
+        motion.div,
+        {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.6, ease: "easeOut" },
+          className:
+            "flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/20 mx-auto mb-3 w-fit",
+        },
+        e(Sparkles, { className: "w-4 h-4 text-black" }),
+        e(
+          "span",
+          { className: "text-[14px] font-normal text-black" },
+          "Auction 2026"
+        )
+      );
+    }
+
+    /* ---------- Navbar ---------- */
+    function Navbar() {
+      const items = [
+        { label: "Auction Room", hasDropdown: false },
+        { label: "Squad View", hasDropdown: true },
+        { label: "Leaderboard", hasDropdown: false },
+        { label: "Live Stats", hasDropdown: true },
+      ];
+
+      return e(
+        "nav",
+        {
+          className:
+            "flex items-center justify-between py-6 px-6 md:px-10 w-full relative z-10",
+        },
+        e("div", { className: "flex-1 hidden md:block" }),
+        e(
+          "ul",
+          {
+            className:
+              "hidden md:flex items-center gap-8 text-[rgb(45,45,45)] font-normal text-sm",
+          },
+          items.map((it) =>
+            e(
+              "li",
+              {
+                key: it.label,
+                className:
+                  "cursor-pointer hover:opacity-70 transition-opacity flex items-center gap-1 group",
+              },
+              it.label,
+              it.hasDropdown
+                ? e(ChevronRight, {
+                    className:
+                      "w-4 h-4 transition-transform group-hover:translate-x-0.5",
+                  })
+                : null
+            )
+          )
+        ),
+        e(
+          "div",
+          { className: "md:hidden" },
+          e(
+            "span",
+            {
+              className:
+                "font-regular tracking-tighter text-xl text-[rgba(30,50,90,0.9)]",
+            },
+            "AUCTION"
+          )
+        ),
+        e(
+          "div",
+          { className: "flex-1 flex justify-end" },
+          null
+        )
+      );
+    }
+
+    /* ---------- BottomLeftCard ---------- */
+    function BottomLeftCard() {
+      return e(
+        motion.div,
+        {
+          initial: { x: -20, opacity: 0 },
+          animate: { x: 0, opacity: 1 },
+          transition: { duration: 0.8, delay: 0.2 },
+          className:
+            "absolute bottom-28 right-4 left-auto md:left-6 md:right-auto md:bottom-6 lg:bottom-10 lg:left-10 p-3 md:p-4 lg:p-5 rounded-[1.2rem] md:rounded-[1.5rem] lg:rounded-[2.2rem] bg-white/30 backdrop-blur-xl flex flex-col gap-2 lg:gap-3 min-w-[140px] md:min-w-[150px] lg:min-w-[180px] w-fit",
+        },
+        e(
+          "div",
+          { className: "flex flex-col" },
+          e(
+            "span",
+            {
+              className:
+                "text-2xl md:text-3xl font-normal text-[rgba(30,50,90,0.9)] tracking-tight",
+            },
+            "360+"
+          ),
+          e(
+            "span",
+            {
+              className:
+                "text-[10px] md:text-[12px] font-normal text-black/60 uppercase tracking-wider",
+            },
+            "Players Drafted"
+          )
+        ),
+        e(
+          motion.button,
+          {
+            whileHover: { scale: 1.02 },
+            whileTap: { scale: 0.98 },
+            className:
+              "flex items-center bg-white rounded-full pl-1.5 pr-5 py-1.5 gap-2 hover:bg-white/90 transition-colors self-start group",
+          },
+          e(
+            "div",
+            {
+              className:
+                "bg-[rgba(30,50,90,0.1)] p-1 rounded-full flex items-center justify-center",
+            },
+            e(ArrowUpRight, {
+              className: "w-4 h-4 text-[rgba(30,50,90,0.9)]",
+            })
+          ),
+          e(
+            "span",
+            {
+              className:
+                "text-[14px] font-normal text-[rgba(30,50,90,0.9)]",
+            },
+            "Join Discord"
+          )
+        )
+      );
+    }
+
+    /* ---------- BottomRightCorner ---------- */
+    function BottomRightCorner_REMOVED() { return null; }
+
+    /* ---------- Hero ---------- */
+    function Hero() {
+      return e(
+        "div",
+        {
+          className:
+            "w-full h-screen flex items-center justify-center p-3 md:p-5 bg-[#f0f0f0]",
+        },
+        e(
+          "section",
+          {
+            className:
+              "relative w-full max-w-[1536px] h-full rounded-[1.5rem] md:rounded-[3rem] overflow-hidden shadow-none flex flex-col items-center bg-white/10 group",
+          },
+          // Video bg
+          e(
+            "video",
+            {
+              autoPlay: true,
+              muted: true,
+              loop: true,
+              playsInline: true,
+              className:
+                "absolute inset-0 w-full h-full object-cover object-[65%] lg:object-center z-0",
+              src: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260428_193507_4286c423-2fd9-4efd-92bd-91a939453fc1.mp4",
+            }
+          ),
+          // Content layer
+          e(
+            "div",
+            {
+              className:
+                "relative z-10 w-full h-full flex flex-col items-center",
+            },
+            e(Navbar),
+            e(
+              "div",
+              {
+                className:
+                  "w-full flex flex-col items-center pt-8 px-6 text-center max-w-4xl",
+              },
+              e(HeroBadge),
+              e(
+                motion.h1,
+                {
+                  initial: { opacity: 0, scale: 0.98 },
+                  animate: { opacity: 1, scale: 1 },
+                  transition: { duration: 0.8, delay: 0.2 },
+                  className:
+                    "text-4xl sm:text-5xl md:text-6xl lg:text-[80px] font-normal text-black mb-2 tracking-tight leading-[1.05]",
+                },
+                "Elite Auction Master"
+              ),
+              e(
+                motion.p,
+                {
+                  initial: { opacity: 0 },
+                  animate: { opacity: 1 },
+                  transition: { duration: 0.8, delay: 0.4 },
+                  className:
+                    "text-sm sm:text-base md:text-lg text-black/80 opacity-80 leading-relaxed max-w-xl font-normal",
+                },
+                "Scout top talent, manage your purse, and dominate the league with a championship-winning squad."
+              )
+            ),
+            e(BottomRightCorner_REMOVED)
+          )
+        )
+      );
+    }
+
+    /* TARGO + AsmeHero removed per design direction.
+       The black scroll page now opens directly with the Pioneering section
+       so it reads as a continuation of the RIVR hero above. */
+    function _TargoHeader_REMOVED() {
+      const Logo = e(
+        "div",
+        { className: "flex items-center gap-2.5" },
+        e(
+          "svg",
+          { width: "28", height: "28", viewBox: "0 0 32 32", fill: "none", xmlns: "http://www.w3.org/2000/svg" },
+          e("path", { d: "M4 22 L16 4 L28 22 Z", stroke: "#fff", strokeWidth: "2", fill: "none" }),
+          e("path", { d: "M10 22 L16 13 L22 22", stroke: "#EE3F2C", strokeWidth: "2", fill: "none" })
+        ),
+        e(
+          "span",
+          { className: "font-rubik font-bold text-white text-[20px] tracking-[-0.04em] lowercase" },
+          "targo"
+        )
+      );
+      const links = ["Home", "About", "Contact Us"];
+      return e(
+        "header",
+        { className: "absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 md:px-16 py-6" },
+        Logo,
+        e(
+          "nav",
+          { className: "hidden md:flex items-center gap-9" },
+          links.map((l) =>
+            e(
+              "a",
+              {
+                key: l,
+                href: "#",
+                className:
+                  "font-rubik text-white/85 hover:text-white text-[14px] font-medium tracking-tight transition-colors",
+              },
+              l
+            )
+          )
+        ),
+        e(
+          "button",
+          {
+            className:
+              "clip-corner-btn-sm bg-[#EE3F2C] hover:bg-[#d6321f] transition-colors text-white font-rubik font-medium text-[12px] uppercase tracking-[0.06em] px-5 py-2.5",
+          },
+          "Contact Us"
+        )
+      );
+    }
+
+    function TargoConsultationCard() {
+      return e(
+        "div",
+        {
+          className:
+            "targo-glass rounded-2xl p-5 md:p-6 w-[300px] md:w-[340px] flex items-center gap-4 relative overflow-hidden",
+        },
+        e("div", {
+          className: "absolute inset-0 pointer-events-none",
+          style: {
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 45%)",
+          },
+        }),
+        e(
+          "button",
+          {
+            className:
+              "clip-corner-btn-sm bg-white text-black w-12 h-12 flex items-center justify-center shrink-0",
+          },
+          e(Phone, { className: "w-5 h-5" })
+        ),
+        e(
+          "div",
+          { className: "flex flex-col" },
+          e(
+            "span",
+            { className: "font-rubik text-white/60 text-[11px] uppercase tracking-[0.14em]" },
+            "Free 30 min call"
+          ),
+          e(
+            "span",
+            { className: "font-rubik text-white text-[15px] md:text-[16px] font-medium tracking-tight" },
+            "Book a Free Consultation"
+          )
+        )
+      );
+    }
+
+    function TargoHero() {
+      return e(
+        "section",
+        {
+          className:
+            "relative w-full h-screen min-h-[640px] bg-black overflow-hidden font-rubik",
+        },
+        e("video", {
+          autoPlay: true,
+          muted: true,
+          loop: true,
+          playsInline: true,
+          preload: "auto",
+          className: "absolute inset-0 w-full h-full object-cover z-0",
+          src: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260227_042027_c4b2f2ea-1c7c-4d6e-9e3d-81a78063703f.mp4",
+        }),
+        e(TargoHeader),
+        // Hero content (upper third, left aligned)
+        e(
+          "div",
+          {
+            className:
+              "relative z-10 px-8 md:px-16 pt-32 md:pt-40 max-w-[1400px]",
+          },
+          e(
+            "h1",
+            {
+              className:
+                "font-rubik font-bold uppercase text-white tracking-[-0.04em] leading-[0.95] text-[42px] sm:text-[52px] md:text-[64px] max-w-[14ch]",
+            },
+            "Swift and Simple",
+            e("br"),
+            "Transport"
+          ),
+          e(
+            "button",
+            {
+              className:
+                "clip-corner-btn bg-[#EE3F2C] hover:bg-[#d6321f] transition-colors text-white font-rubik font-medium text-[14px] uppercase tracking-[0.08em] mt-8 px-7 py-3.5",
+            },
+            "Get Started"
+          )
+        ),
+        // Bottom-left widget
+        e(
+          "div",
+          { className: "absolute bottom-8 left-8 md:bottom-10 md:left-16 z-10" },
+          e(TargoConsultationCard)
+        )
+      );
+    }
+
+    function _AsmeHero_REMOVED() {
+      const videoRef = React.useRef(null);
+
+      React.useEffect(() => {
+        const v = videoRef.current;
+        if (!v) return;
+        v.style.opacity = "0";
+
+        let raf = 0;
+        const animateOpacity = (from, to, duration) => {
+          cancelAnimationFrame(raf);
+          const start = performance.now();
+          const tick = (now) => {
+            const t = Math.min(1, (now - start) / duration);
+            v.style.opacity = String(from + (to - from) * t);
+            if (t < 1) raf = requestAnimationFrame(tick);
+          };
+          raf = requestAnimationFrame(tick);
+        };
+
+        const onCanPlay = () => {
+          v.play().catch(() => {});
+          animateOpacity(0, 1, 500);
+        };
+        const onTimeUpdate = () => {
+          if (!v.duration) return;
+          if (v.duration - v.currentTime <= 0.55) {
+            const cur = parseFloat(v.style.opacity || "1");
+            if (cur > 0.05) animateOpacity(cur, 0, 500);
+          }
+        };
+        const onEnded = () => {
+          v.style.opacity = "0";
+          setTimeout(() => {
+            v.currentTime = 0;
+            v.play().catch(() => {});
+            animateOpacity(0, 1, 500);
+          }, 100);
+        };
+        v.addEventListener("canplay", onCanPlay);
+        v.addEventListener("timeupdate", onTimeUpdate);
+        v.addEventListener("ended", onEnded);
+        return () => {
+          cancelAnimationFrame(raf);
+          v.removeEventListener("canplay", onCanPlay);
+          v.removeEventListener("timeupdate", onTimeUpdate);
+          v.removeEventListener("ended", onEnded);
+        };
+      }, []);
+
+      return e(
+        "section",
+        { className: "relative min-h-screen overflow-hidden bg-black flex flex-col" },
+        e("video", {
+          ref: videoRef,
+          muted: true,
+          autoPlay: true,
+          playsInline: true,
+          preload: "auto",
+          className: "absolute inset-0 w-full h-full object-cover object-bottom",
+          style: { opacity: 0 },
+          src: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_074625_a81f018a-956b-43fb-9aee-4d1508e30e6a.mp4",
+        }),
+        // Navbar
+        e(
+          "div",
+          { className: "relative z-20 px-6 py-6" },
+          e(
+            "div",
+            {
+              className:
+                "liquid-glass rounded-full max-w-5xl mx-auto px-6 py-3 flex items-center justify-between",
+            },
+            e(
+              "div",
+              { className: "flex items-center" },
+              e(
+                "div",
+                { className: "flex items-center gap-2" },
+                e(Globe, { className: "w-6 h-6 text-white" }),
+                e("span", { className: "text-white font-semibold text-lg" }, "Auction")
+              ),
+              e(
+                "nav",
+                { className: "hidden md:flex items-center gap-8 ml-8" },
+                ["Features", "Pricing", "About"].map((l) =>
+                  e(
+                    "a",
+                    {
+                      key: l,
+                      href: "#",
+                      className:
+                        "text-white/80 hover:text-white text-sm font-medium transition-colors",
+                    },
+                    l
+                  )
+                )
+              )
+            ),
+            e(
+              "div",
+              { className: "flex items-center gap-3" },
+              e(
+                "button",
+                { className: "text-white text-sm font-medium" },
+                "Sign Up"
+              ),
+              e(
+                "button",
+                {
+                  className:
+                    "liquid-glass rounded-full px-6 py-2 text-white text-sm font-medium",
+                },
+                "Login"
+              )
+            )
+          )
+        ),
+        // Hero content
+        e(
+          "div",
+          {
+            className:
+              "relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12 text-center",
+            style: { transform: "translateY(-20%)" },
+          },
+          e(
+            "h1",
+            {
+              className:
+                "font-instrument text-white tracking-tight whitespace-nowrap text-7xl md:text-8xl lg:text-9xl mb-10",
+            },
+            "Know it then ",
+            e("em", { className: "italic" }, "all"),
+            "."
+          ),
+          e(
+            "div",
+            { className: "max-w-xl w-full mb-6" },
+            e(
+              "div",
+              {
+                className:
+                  "liquid-glass rounded-full pl-6 pr-2 py-2 flex items-center gap-3",
+              },
+              e("input", {
+                type: "email",
+                placeholder: "Enter your email",
+                className:
+                  "flex-1 bg-transparent outline-none text-white placeholder:text-white/40 text-sm",
+              }),
+              e(
+                "button",
+                {
+                  className:
+                    "bg-white rounded-full p-3 text-black flex items-center justify-center",
+                },
+                e(ArrowRight, { className: "w-5 h-5" })
+              )
+            )
+          ),
+          e(
+            "p",
+            { className: "text-white text-sm leading-relaxed px-4 max-w-xl mb-8" },
+            "Stay updated with the latest news and insights. Subscribe to our newsletter today and never miss out on exciting updates."
+          ),
+          e(
+            "button",
+            {
+              className:
+                "liquid-glass rounded-full px-8 py-3 text-white text-sm font-medium hover:bg-white/5 transition-colors",
+            },
+            "Manifesto"
+          )
+        ),
+        // Social footer
+        e(
+          "div",
+          { className: "relative z-10 flex justify-center gap-4 pb-12" },
+          [Instagram, Twitter, Globe].map((Icon, i) =>
+            e(
+              "button",
+              {
+                key: i,
+                className:
+                  "liquid-glass rounded-full p-4 text-white/80 hover:text-white hover:bg-white/5 transition-all",
+              },
+              e(Icon, { className: "w-5 h-5" })
+            )
+          )
+        )
+      );
+    }
+
+    function AsmeAbout() {
+      const ref = React.useRef(null);
+      const [inView, setInView] = React.useState(false);
+      React.useEffect(() => {
+        if (!ref.current) return;
+        const o = new IntersectionObserver(
+          (entries) => entries.forEach((en) => en.isIntersecting && setInView(true)),
+          { rootMargin: "-100px" }
+        );
+        o.observe(ref.current);
+        return () => o.disconnect();
+      }, []);
+      const a = (delay) => ({
+        initial: { opacity: 0, y: 40 },
+        animate: inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 },
+        transition: { duration: 0.8, delay },
+      });
+      const aLabel = {
+        initial: { opacity: 0, y: 20 },
+        animate: inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
+        transition: { duration: 0.6 },
+      };
+      return e(
+        "section",
+        {
+          ref,
+          className:
+            "relative bg-black pt-32 md:pt-44 pb-10 md:pb-14 px-6 overflow-hidden bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.03)_0%,_transparent_70%)]",
+        },
+        e(
+          "div",
+          { className: "max-w-6xl mx-auto" },
+          e(
+            motion.p,
+            {
+              ...aLabel,
+              className: "text-white/40 text-sm tracking-widest uppercase mb-8",
+            },
+            "The vision behind the Auction"
+          ),
+          e(
+            motion.h2,
+            {
+              ...a(0.1),
+              className:
+                "text-4xl md:text-6xl lg:text-7xl text-white leading-[1.1] tracking-tight",
+            },
+            "Unleashing ",
+            e("span", { className: "font-instrument italic text-white/60" }, "strategies"),
+            " for",
+            e("br", { className: "hidden md:block" }),
+            " ",
+            e(
+              "span",
+              { className: "font-instrument italic text-white/60" },
+              "teams that compete, scout, and win."
+            )
+          )
+        )
+      );
+    }
+
+    function AsmeFeatured() {
+      const ref = React.useRef(null);
+      const [inView, setInView] = React.useState(false);
+      React.useEffect(() => {
+        if (!ref.current) return;
+        const o = new IntersectionObserver(
+          (entries) => entries.forEach((en) => en.isIntersecting && setInView(true)),
+          { rootMargin: "-100px" }
+        );
+        o.observe(ref.current);
+        return () => o.disconnect();
+      }, []);
+      return e(
+        "section",
+        {
+          ref,
+          className: "relative bg-black pt-6 md:pt-10 pb-20 md:pb-32 px-6 overflow-hidden",
+        },
+        e(
+          motion.div,
+          {
+            initial: { opacity: 0, y: 60 },
+            animate: inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 },
+            transition: { duration: 0.9 },
+            className:
+              "relative max-w-6xl mx-auto rounded-3xl overflow-hidden aspect-video",
+          },
+          e("video", {
+            muted: true,
+            autoPlay: true,
+            loop: true,
+            playsInline: true,
+            preload: "auto",
+            className: "w-full h-full object-cover",
+            src: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260402_054547_9875cfc5-155a-4229-8ec8-b7ba7125cbf8.mp4",
+          }),
+          e("div", {
+            className:
+              "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none",
+          }),
+          e(
+            "div",
+            {
+              className:
+                "absolute bottom-0 left-0 right-0 p-6 md:p-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6",
+            },
+            e(
+              "div",
+              { className: "liquid-glass rounded-2xl p-6 md:p-8 max-w-md" },
+              e(
+                "p",
+                { className: "text-white/50 text-xs tracking-widest uppercase mb-3" },
+                "Our Strategy"
+              ),
+              e(
+                "p",
+                { className: "text-white text-sm md:text-base leading-relaxed" },
+                "We believe in the power of data-driven player selection. Every bid starts with a calculation, and every buy opens a new path to the championship trophy."
+              )
+            ),
+            e(
+              motion.button,
+              {
+                whileHover: { scale: 1.05 },
+                whileTap: { scale: 0.95 },
+                className:
+                  "liquid-glass rounded-full px-8 py-3 text-white text-sm font-medium self-start md:self-end",
+              },
+              "Explore more"
+            )
+          )
+        )
+      );
+    }
+
+    function AsmePhilosophy() {
+      const ref = React.useRef(null);
+      const [inView, setInView] = React.useState(false);
+      React.useEffect(() => {
+        if (!ref.current) return;
+        const o = new IntersectionObserver(
+          (entries) => entries.forEach((en) => en.isIntersecting && setInView(true)),
+          { rootMargin: "-100px" }
+        );
+        o.observe(ref.current);
+        return () => o.disconnect();
+      }, []);
+      const fade = (extra, delay = 0) => ({
+        initial: { opacity: 0, ...extra },
+        animate: inView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, ...extra },
+        transition: { duration: 0.8, delay },
+      });
+      return e(
+        "section",
+        { ref, className: "relative bg-black py-28 md:py-40 px-6 overflow-hidden" },
+        e(
+          "div",
+          { className: "max-w-6xl mx-auto" },
+          e(
+            motion.h2,
+            {
+              ...fade({ y: 40 }),
+              className:
+                "text-5xl md:text-7xl lg:text-8xl text-white tracking-tight mb-16 md:mb-24",
+            },
+            "Auction ",
+            e("span", { className: "font-instrument italic text-white/40" }, "x"),
+            " Strategy"
+          ),
+          e(
+            "div",
+            { className: "grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12" },
+            e(
+              motion.div,
+              {
+                ...fade({ x: -40 }, 0.1),
+                className: "rounded-3xl overflow-hidden aspect-[4/3]",
+              },
+              e("video", {
+                muted: true,
+                autoPlay: true,
+                loop: true,
+                playsInline: true,
+                preload: "auto",
+                className: "w-full h-full object-cover",
+                src: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260307_083826_e938b29f-a43a-41ec-a153-3d4730578ab8.mp4",
+              })
+            ),
+            e(
+              motion.div,
+              {
+                ...fade({ x: 40 }, 0.2),
+                className: "flex flex-col gap-10 justify-center",
+              },
+              e(
+                "div",
+                null,
+                e(
+                  "p",
+                  { className: "text-white/40 text-xs tracking-widest uppercase mb-4" },
+                  "Build your squad"
+                ),
+                e(
+                  "p",
+                  { className: "text-white/70 text-base md:text-lg leading-relaxed" },
+                  "Every meaningful auction victory begins at the intersection of disciplined budget management and remarkable player scouting. We operate at that crossroads, turning bold bids into championship-winning squads."
+                )
+              ),
+              e("div", { className: "w-full h-px bg-white/10" }),
+              e(
+                "div",
+                null,
+                e(
+                  "p",
+                  { className: "text-white/40 text-xs tracking-widest uppercase mb-4" },
+                  "Scout the future"
+                ),
+                e(
+                  "p",
+                  { className: "text-white/70 text-base md:text-lg leading-relaxed" },
+                  "We believe that the best teams emerge when scouting meets conviction. Our process is designed to uncover hidden gems and translate them into a formidable roster that dominates the league."
+                )
+              )
+            )
+          )
+        )
+      );
+    }
+
+    function AsmeServiceCard({ idx, video, tag, title, desc, inView }) {
+      return e(
+        motion.div,
+        {
+          initial: { opacity: 0, y: 50 },
+          animate: inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 },
+          transition: { duration: 0.8, delay: 0.15 * idx },
+          className: "liquid-glass rounded-3xl overflow-hidden group",
+        },
+        e(
+          "div",
+          { className: "relative aspect-video overflow-hidden" },
+          e("video", {
+            muted: true,
+            autoPlay: true,
+            loop: true,
+            playsInline: true,
+            preload: "auto",
+            className:
+              "w-full h-full object-cover transition-transform duration-700 group-hover:scale-105",
+            src: video,
+          }),
+          e("div", {
+            className:
+              "absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none",
+          })
+        ),
+        e(
+          "div",
+          { className: "p-6 md:p-8" },
+          e(
+            "div",
+            { className: "flex items-center justify-between mb-4" },
+            e(
+              "span",
+              { className: "text-white/40 text-xs uppercase tracking-widest" },
+              tag
+            ),
+            e(
+              "div",
+              { className: "liquid-glass rounded-full p-2" },
+              e(ArrowUpRight, { className: "w-4 h-4 text-white" })
+            )
+          ),
+          e(
+            "h3",
+            { className: "text-white text-xl md:text-2xl mb-3 tracking-tight" },
+            title
+          ),
+          e(
+            "p",
+            { className: "text-white/50 text-sm leading-relaxed" },
+            desc
+          )
+        )
+      );
+    }
+
+    function AsmeServices() {
+      const ref = React.useRef(null);
+      const [inView, setInView] = React.useState(false);
+      React.useEffect(() => {
+        if (!ref.current) return;
+        const o = new IntersectionObserver(
+          (entries) => entries.forEach((en) => en.isIntersecting && setInView(true)),
+          { rootMargin: "-100px" }
+        );
+        o.observe(ref.current);
+        return () => o.disconnect();
+      }, []);
+      return e(
+        "section",
+        {
+          ref,
+          className:
+            "relative bg-black py-28 md:py-40 px-6 overflow-hidden bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.02)_0%,_transparent_60%)]",
+        },
+        e(
+          "div",
+          { className: "max-w-6xl mx-auto" },
+          e(
+            motion.div,
+            {
+              initial: { opacity: 0, y: 30 },
+              animate: inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 },
+              transition: { duration: 0.7 },
+              className: "flex items-end justify-between mb-12 md:mb-16",
+            },
+            e(
+              "h2",
+              { className: "text-3xl md:text-5xl text-white tracking-tight" },
+              "What we do"
+            ),
+            e(
+              "span",
+              { className: "hidden md:block text-white/40 text-sm" },
+              "Our services"
+            )
+          ),
+          e(
+            "div",
+            { className: "grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8" },
+            e(AsmeServiceCard, {
+              idx: 0,
+              inView,
+              video:
+                "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4",
+              tag: "Analysis",
+              title: "Scouting & Insight",
+              desc: "We dig deep into player stats, form, and match-ups to surface the insights that drive winning auction decisions.",
+            }),
+            e(AsmeServiceCard, {
+              idx: 1,
+              inView,
+              video:
+                "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4",
+              tag: "Draft",
+              title: "Budget & Execution",
+              desc: "From opening bids to final squad filling, we obsess over every million to deliver a roster that feels balanced and looks extraordinary.",
+            })
+          )
+        )
+      );
+    }
+
+    /* Smooth bridge from light RIVR hero into black scroll page.
+       Gradient transition + slim divider so the black section feels
+       like a continuation rather than a separate page. */
+    function SectionBridge() {
+      return e("div", {
+        "aria-hidden": true,
+        className: "h-24 md:h-32 w-full",
+        style: {
+          background: "linear-gradient(to bottom, #f0f0f0 0%, #1a1a1a 70%, #000 100%)",
+        },
+      });
+    }
+
+    function App() {
+      return e(
+        "main",
+        { className: "w-full bg-black" },
+        e("div", { className: "bg-[#f0f0f0]" }, e(Hero)),
+        e(SectionBridge),
+        e(
+          "div",
+          { className: "bg-black" },
+          e(AsmeAbout),
+          e(AsmeFeatured),
+          e(AsmePhilosophy),
+          e(AsmeServices)
+        )
+      );
+    }
+
+    createRoot(document.getElementById("root")).render(e(App));
+  </script>
+</body>
+</html>
