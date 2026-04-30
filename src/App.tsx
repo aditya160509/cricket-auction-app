@@ -15,7 +15,7 @@ const LIVE_AUCTION_BG = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJ
 const SQUADS_BG = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260406_094145_4a271a6c-3869-4f1c-8aa7-aeb0cb227994.mp4'
 
 const TEAMS: Array<{ id: TeamId; name: string; short: string }> = [
-  { id: 'mi', name: "aagam'sXI", short: 'AXI' },
+  { id: 'mi', name: "aagam's XI", short: 'AXI' },
   { id: 'csk', name: "karan's XI", short: 'KXI' },
   { id: 'rcb', name: "dev's XI", short: 'DXI' },
 ]
@@ -61,12 +61,19 @@ export default function App() {
         fetch('/player.md').then((r) => r.text()),
         fetch('/tier-list.md').then((r) => r.text()),
       ])
-      const names = playersMd.split(/\r?\n/).map((x) => x.trim()).filter(Boolean)
+      const rawNames = playersMd.split(/\r?\n/).map((x) => x.trim()).filter(Boolean)
+      const banned = new Set(['dev', 'aagam', 'karan'])
+      const names = rawNames.filter((n) => !banned.has(n.toLowerCase()))
+      if (!names.some((n) => n.toLowerCase() === 'kabir')) names.push('kabir')
+      if (!names.some((n) => n.toLowerCase() === 'anshul')) names.push('anshul')
+
       const tierMap = new Map<string, Tier>()
       const tiers = parseTiers(tiersMd)
       tiers['LEVEL 1'].forEach((n) => tierMap.set(n, 'LEVEL 1'))
       tiers['LEVEL 2'].forEach((n) => tierMap.set(n, 'LEVEL 2'))
       tiers['LEVEL 3'].forEach((n) => tierMap.set(n, 'LEVEL 3'))
+      tierMap.set('kabir', 'LEVEL 3')
+      tierMap.set('anshul', 'LEVEL 3')
 
       const all = names.map((name, i) => ({ id: i + 1, name, tier: tierMap.get(name) ?? 'LEVEL 3', role: ['Batter', 'Bowler', 'All-Rounder', 'Wicket-Keeper'][i % 4] }))
       const randomized = shuffle(all)
@@ -161,7 +168,7 @@ export default function App() {
                 <div className="price">₹{currentBid}L</div>
                 <div className="controls big">{[5, 10, 15, 20].map((v) => <button key={v} className="liquid-glass" onClick={() => setCurrentBid((b) => b + v)}>+{v}L</button>)}</div>
                 <div className="controls"><input value={custom} onChange={(e) => setCustom(e.target.value)} type="number" placeholder="Custom in Lakhs" /><button className="liquid-glass" onClick={() => { const v = Number(custom); if (v > 0) setCurrentBid((b) => b + v) }}>+Custom</button><button className="liquid-glass" onClick={() => { const v = Number(custom); if (v >= BASE_PRICE) setCurrentBid(v) }}>Set</button></div>
-                <div className="controls"><button className="liquid-glass" onClick={nextPlayer}>Next Player</button><button className="liquid-glass" onClick={() => sellToTeam('mi')}>Sold MI</button><button className="liquid-glass" onClick={() => sellToTeam('csk')}>Sold CSK</button><button className="liquid-glass" onClick={() => sellToTeam('rcb')}>Sold RCB</button><button className="liquid-glass" onClick={cancelLastSale}>Cancel Last Sale</button></div>
+                <div className="controls"><button className="liquid-glass" onClick={nextPlayer}>Next Player</button><button className="liquid-glass" onClick={() => sellToTeam('mi')}>Sold aagam's XI</button><button className="liquid-glass" onClick={() => sellToTeam('csk')}>Sold karan's XI</button><button className="liquid-glass" onClick={() => sellToTeam('rcb')}>Sold dev's XI</button><button className="liquid-glass" onClick={cancelLastSale}>Cancel Last Sale</button></div>
               </div>
             </main>
 
