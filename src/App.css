@@ -82,10 +82,10 @@ body, #root, .app-shell { margin: 0; min-height: 100dvh; background: #e9eff6; co
   color: #0b1220;
 }
 .panel-strong {
-  background: rgba(244, 250, 255, 0.62);
+  background: rgba(244, 250, 255, 0.42);
 }
 .panel-focus {
-  background: rgba(248, 252, 255, 0.76);
+  background: rgba(248, 252, 255, 0.52);
 }
 
 .card h3 {
@@ -113,7 +113,7 @@ body, #root, .app-shell { margin: 0; min-height: 100dvh; background: #e9eff6; co
 .row strong {
   color: #0b1220;
   font-size: 2rem;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .log-scroll { max-height: 600px; overflow: auto; }
@@ -145,11 +145,11 @@ body, #root, .app-shell { margin: 0; min-height: 100dvh; background: #e9eff6; co
 }
 .center-block h1 {
   margin: 8px 0 2px;
-  font-size: clamp(3.6rem, 7.6vw, 7rem);
+  font-size: clamp(2.8rem, 6.2vw, 5.4rem);
   line-height: 0.9;
   color: #040c18;
-  font-weight: 900;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: -0.015em;
 }
 .center-block h2 {
   margin: 0;
@@ -158,7 +158,7 @@ body, #root, .app-shell { margin: 0; min-height: 100dvh; background: #e9eff6; co
   font-size: clamp(1.15rem, 2.1vw, 1.6rem);
 }
 .price {
-  font-size: clamp(5rem, 10vw, 8.8rem);
+  font-size: clamp(3.8rem, 8.4vw, 6.6rem);
   font-weight: 900;
   color: #0a121f;
   line-height: 0.88;
