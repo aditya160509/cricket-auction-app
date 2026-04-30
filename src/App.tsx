@@ -7,7 +7,7 @@ type Tier = 'LEVEL 1' | 'LEVEL 2' | 'LEVEL 3'
 
 type Player = { id: number; name: string; tier: Tier; role: string }
 type TeamState = { budget: number; players: Array<{ name: string; price: number; tier: Tier; role: string }> }
-type SaleLog = { id: string; text: string; teamId: TeamId; player: Player; price: number }
+type SaleLog = { id: string; text: string; teamId: TeamId; player: Player; price: number; at: string }
 
 const BASE_PRICE = 10
 const TEAM_BUDGET = 1000
@@ -83,6 +83,7 @@ export default function App() {
     setCurrentPlayer(pool[0])
     setPool((p) => p.slice(1))
     setCurrentBid(BASE_PRICE)
+    setCustom('')
   }
 
   const sellToTeam = (teamId: TeamId) => {
@@ -99,8 +100,9 @@ export default function App() {
     }))
 
     const tname = TEAMS.find((t) => t.id === teamId)?.short ?? teamId.toUpperCase()
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     const message = `${currentPlayer.name} sold to ${tname} for ₹${soldPrice}L`
-    setSaleLog((prev) => [{ id: `${Date.now()}`, text: message, teamId, player: currentPlayer, price: soldPrice }, ...prev].slice(0, 20))
+    setSaleLog((prev) => [{ id: `${Date.now()}`, text: message, teamId, player: currentPlayer, price: soldPrice, at: now }, ...prev].slice(0, 24))
     nextPlayer()
   }
 
@@ -146,14 +148,14 @@ export default function App() {
           <video className="bg-video" autoPlay muted loop playsInline src={LIVE_AUCTION_BG} />
           <div className="veil" />
           <div className="board roomy-3">
-            <aside className="card liquid-glass">
+            <aside className="card liquid-glass panel-strong">
               <h3>Teams Budget</h3>
               {TEAMS.map((t) => <div key={t.id} className="row liquid-glass"><span>{t.name}</span><strong>₹{(teams[t.id].budget / 100).toFixed(2)}Cr</strong></div>)}
             </aside>
 
-            <main className="card liquid-glass">
+            <main className="card liquid-glass panel-focus">
               <div className="center-block">
-                <p>Current Player</p>
+                <p className="eyebrow">Current Player</p>
                 <h1>{currentPlayer ? currentPlayer.name : 'No Player On Stage'}</h1>
                 <h2>{currentPlayer ? `${currentPlayer.role} • ${currentPlayer.tier}` : 'Pool exhausted'}</h2>
                 <div className="price">₹{currentBid}L</div>
@@ -163,9 +165,9 @@ export default function App() {
               </div>
             </main>
 
-            <aside className="card liquid-glass">
+            <aside className="card liquid-glass panel-strong">
               <h3>Latest Sold</h3>
-              <div className="log-scroll">{saleLog.length ? saleLog.map((l) => <div key={l.id} className="log-item liquid-glass">{l.text}</div>) : <div className="muted">No sales yet</div>}</div>
+              <div className="log-scroll">{saleLog.length ? saleLog.map((l) => <div key={l.id} className="log-item liquid-glass"><span>{l.text}</span><time>{l.at}</time></div>) : <div className="muted">No sales yet</div>}</div>
             </aside>
           </div>
         </section>
@@ -177,7 +179,7 @@ export default function App() {
           <div className="veil" />
           <div className="squad-layout wide-cards">
             {TEAMS.map((t) => (
-              <details key={t.id} className="card liquid-glass squad-expand" open>
+              <details key={t.id} className="card liquid-glass squad-expand panel-strong" open>
                 <summary>
                   <div>
                     <h3>{t.name}</h3>
